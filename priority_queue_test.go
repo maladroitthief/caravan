@@ -1,6 +1,7 @@
 package caravan_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/maladroitthief/caravan"
@@ -14,6 +15,7 @@ func Test_priority_queue_Dequeue(t *testing.T) {
 	tests := []struct {
 		name  string
 		items []item
+		err   error
 		wants []string
 	}{
 		{
@@ -21,6 +23,7 @@ func Test_priority_queue_Dequeue(t *testing.T) {
 			items: []item{
 				{value: "test", priority: 1},
 			},
+			err: nil,
 			wants: []string{
 				"test",
 			},
@@ -39,6 +42,7 @@ func Test_priority_queue_Dequeue(t *testing.T) {
 				{value: "ninth", priority: 9},
 				{value: "first", priority: 1},
 			},
+			err: nil,
 			wants: []string{
 				"tenth",
 				"ninth",
@@ -52,6 +56,14 @@ func Test_priority_queue_Dequeue(t *testing.T) {
 				"first",
 			},
 		},
+		{
+			name:  "no elements",
+			items: []item{},
+			err:   caravan.ErrPriorityQueueEmpty,
+			wants: []string{
+				"",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -61,7 +73,11 @@ func Test_priority_queue_Dequeue(t *testing.T) {
 			}
 
 			for _, want := range tt.wants {
-				got := pq.Dequeue()
+				got, err := pq.Dequeue()
+				if err != nil && !errors.Is(err, tt.err) {
+					t.Errorf("PriorityQueue.Dequeue() error: want %+v, got: %+v\n", tt.err, err)
+				}
+
 				if want != got {
 					t.Errorf("PriorityQueue.Dequeue(): want %+v, got: %+v\n", want, got)
 				}

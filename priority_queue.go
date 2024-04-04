@@ -1,6 +1,9 @@
 package caravan
 
-import "container/heap"
+import (
+	"container/heap"
+	"errors"
+)
 
 type (
 	PriorityQueue[T any] struct {
@@ -14,6 +17,10 @@ type (
 	}
 
 	pqHeap[T any] []*pqHeapItem[T]
+)
+
+var (
+	ErrPriorityQueueEmpty = errors.New("priority queue has no elements")
 )
 
 func NewPriorityQueue[T any]() *PriorityQueue[T] {
@@ -31,10 +38,14 @@ func (pq *PriorityQueue[T]) Enqueue(value T, priority int) {
 	})
 }
 
-func (pq *PriorityQueue[T]) Dequeue() T {
-	item := heap.Pop(pq.heap).(*pqHeapItem[T])
+func (pq *PriorityQueue[T]) Dequeue() (T, error) {
+	if pq.heap.Len() <= 0 {
+		var v T
+		return v, ErrPriorityQueueEmpty
+	}
 
-	return item.value
+	item := heap.Pop(pq.heap).(*pqHeapItem[T])
+	return item.value, nil
 }
 
 func (pq *PriorityQueue[T]) Len() int {
