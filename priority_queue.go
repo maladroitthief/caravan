@@ -7,10 +7,12 @@ import (
 
 type (
 	PriorityQueue[T any] struct {
-		heap *pqHeap[T]
+		heap    *pqHeap[T]
+		reverse bool
 	}
 
 	pqHeapItem[T any] struct {
+		reverse  bool
 		value    T
 		index    int
 		priority int
@@ -23,9 +25,10 @@ var (
 	ErrPriorityQueueEmpty = errors.New("priority queue has no elements")
 )
 
-func NewPriorityQueue[T any]() *PriorityQueue[T] {
+func NewPriorityQueue[T any](reverse bool) *PriorityQueue[T] {
 	pq := &PriorityQueue[T]{
-		heap: &pqHeap[T]{},
+		reverse: reverse,
+		heap:    &pqHeap[T]{},
 	}
 
 	return pq
@@ -33,6 +36,7 @@ func NewPriorityQueue[T any]() *PriorityQueue[T] {
 
 func (pq *PriorityQueue[T]) Enqueue(value T, priority int) {
 	heap.Push(pq.heap, &pqHeapItem[T]{
+		reverse:  pq.reverse,
 		value:    value,
 		priority: priority,
 	})
@@ -57,6 +61,10 @@ func (pqh pqHeap[T]) Len() int {
 }
 
 func (pqh pqHeap[T]) Less(i, j int) bool {
+	if pqh[i].reverse {
+		return pqh[i].priority < pqh[j].priority
+	}
+
 	return pqh[i].priority > pqh[j].priority
 }
 

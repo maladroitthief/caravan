@@ -13,13 +13,15 @@ func Test_priority_queue_Dequeue(t *testing.T) {
 		priority int
 	}
 	tests := []struct {
-		name  string
-		items []item
-		err   error
-		wants []string
+		name    string
+		reverse bool
+		items   []item
+		err     error
+		wants   []string
 	}{
 		{
-			name: "single insert",
+			name:    "single insert",
+			reverse: false,
 			items: []item{
 				{value: "test", priority: 1},
 			},
@@ -29,7 +31,8 @@ func Test_priority_queue_Dequeue(t *testing.T) {
 			},
 		},
 		{
-			name: "multiple insert",
+			name:    "multiple insert",
+			reverse: false,
 			items: []item{
 				{value: "forth", priority: 4},
 				{value: "sixth", priority: 6},
@@ -57,17 +60,47 @@ func Test_priority_queue_Dequeue(t *testing.T) {
 			},
 		},
 		{
-			name:  "no elements",
-			items: []item{},
-			err:   caravan.ErrPriorityQueueEmpty,
+			name:    "no elements",
+			reverse: false,
+			items:   []item{},
+			err:     caravan.ErrPriorityQueueEmpty,
 			wants: []string{
 				"",
+			},
+		},
+		{
+			name:    "multiple insert",
+			reverse: true,
+			items: []item{
+				{value: "forth", priority: 4},
+				{value: "sixth", priority: 6},
+				{value: "fifth", priority: 5},
+				{value: "seventh", priority: 7},
+				{value: "tenth", priority: 10},
+				{value: "second", priority: 2},
+				{value: "third", priority: 3},
+				{value: "eighth", priority: 8},
+				{value: "ninth", priority: 9},
+				{value: "first", priority: 1},
+			},
+			err: nil,
+			wants: []string{
+				"first",
+				"second",
+				"third",
+				"forth",
+				"fifth",
+				"sixth",
+				"seventh",
+				"eighth",
+				"ninth",
+				"tenth",
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pq := caravan.NewPriorityQueue[string]()
+			pq := caravan.NewPriorityQueue[string](tt.reverse)
 			for _, item := range tt.items {
 				pq.Enqueue(item.value, item.priority)
 			}
