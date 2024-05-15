@@ -1,18 +1,26 @@
 package caravan
 
-type GIDX struct {
-	generation int
-	index      int
-}
+import "fmt"
 
-type allocatorEntry struct {
-	isLive     bool
-	generation int
-}
+type (
+	GIDX struct {
+		generation int
+		index      int
+	}
 
-type GIDXAllocator struct {
-	entries []allocatorEntry
-	free    []int
+	allocatorEntry struct {
+		isLive     bool
+		generation int
+	}
+
+	GIDXAllocator struct {
+		entries []allocatorEntry
+		free    []int
+	}
+)
+
+func (g GIDX) Info() string {
+	return fmt.Sprintf("%v-%v", g.index, g.generation)
 }
 
 func NewGIDXAllocator() *GIDXAllocator {
