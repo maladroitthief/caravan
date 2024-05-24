@@ -21,7 +21,8 @@ func Test_pq_Dequeue(t *testing.T) {
 		wants   []string
 	}{
 		{
-			name: "single insert",
+			name:    "single insert",
+			reverse: false,
 			items: []item{
 				{value: "test", priority: 1},
 			},
@@ -31,7 +32,8 @@ func Test_pq_Dequeue(t *testing.T) {
 			},
 		},
 		{
-			name: "multiple insert",
+			name:    "multiple insert",
+			reverse: false,
 			items: []item{
 				{value: "forth", priority: 4},
 				{value: "sixth", priority: 6},
@@ -59,17 +61,47 @@ func Test_pq_Dequeue(t *testing.T) {
 			},
 		},
 		{
-			name:  "no elements",
-			items: []item{},
-			err:   caravan.ErrPriorityQueueEmpty,
+			name:    "no elements",
+			reverse: false,
+			items:   []item{},
+			err:     caravan.ErrPriorityQueueEmpty,
 			wants: []string{
 				"",
+			},
+		},
+		{
+			name:    "reverse multiple insert",
+			reverse: true,
+			items: []item{
+				{value: "forth", priority: 4},
+				{value: "sixth", priority: 6},
+				{value: "fifth", priority: 5},
+				{value: "seventh", priority: 7},
+				{value: "tenth", priority: 10},
+				{value: "second", priority: 2},
+				{value: "third", priority: 3},
+				{value: "eighth", priority: 8},
+				{value: "ninth", priority: 9},
+				{value: "first", priority: 1},
+			},
+			err: nil,
+			wants: []string{
+				"first",
+				"second",
+				"third",
+				"forth",
+				"fifth",
+				"sixth",
+				"seventh",
+				"eighth",
+				"ninth",
+				"tenth",
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			pq := caravan.NewPQ[string]()
+			pq := caravan.NewPQ[string](tt.reverse)
 			for _, item := range tt.items {
 				pq.Enqueue(item.value, item.priority)
 			}
@@ -93,7 +125,7 @@ func BenchmarkPQEnqueue(b *testing.B) {
 		id int
 	}
 
-	pq := caravan.NewPQ[entity]()
+	pq := caravan.NewPQ[entity](false)
 	for n := 0; n < b.N; n++ {
 		pq.Enqueue(entity{id: rand.Int()}, rand.Int())
 	}
@@ -104,7 +136,38 @@ func BenchmarkPQDequeue(b *testing.B) {
 		id int
 	}
 
-	pq := caravan.NewPQ[entity]()
+	pq := caravan.NewPQ[entity](false)
+	for i := 0; i < ContainerSize; i++ {
+		pq.Enqueue(entity{id: rand.Int()}, rand.Int())
+	}
+
+	for n := 0; n < b.N; n++ {
+		if n < ContainerSize {
+			_, err := pq.Dequeue()
+			if err != nil {
+				b.Errorf("PQ.Dequeue(false) error: %v", err)
+			}
+		}
+	}
+}
+
+func BenchmarkPQReverseEnqueue(b *testing.B) {
+	type entity struct {
+		id int
+	}
+
+	pq := caravan.NewPQ[entity](true)
+	for n := 0; n < b.N; n++ {
+		pq.Enqueue(entity{id: rand.Int()}, rand.Int())
+	}
+}
+
+func BenchmarkPQReverseDequeue(b *testing.B) {
+	type entity struct {
+		id int
+	}
+
+	pq := caravan.NewPQ[entity](true)
 	for i := 0; i < ContainerSize; i++ {
 		pq.Enqueue(entity{id: rand.Int()}, rand.Int())
 	}

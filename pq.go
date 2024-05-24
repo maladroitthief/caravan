@@ -2,21 +2,27 @@ package caravan
 
 type (
 	PQ[T any] struct {
-		heap pqh[T]
+		heap    pqh[T]
+		reverse byte
 	}
 
 	pqhi[T any] struct {
 		value    T
 		index    int
 		priority int
+		reverse  byte
 	}
 
 	pqh[T any] []pqhi[T]
 )
 
-func NewPQ[T any]() *PQ[T] {
+func NewPQ[T any](reverse bool) *PQ[T] {
 	pq := &PQ[T]{
 		heap: pqh[T]{},
+	}
+
+	if reverse {
+		pq.reverse |= 1
 	}
 
 	return pq
@@ -24,6 +30,7 @@ func NewPQ[T any]() *PQ[T] {
 
 func (pq *PQ[T]) Enqueue(value T, priority int) {
 	pq.heap = pq.heap.Push(pqhi[T]{
+		reverse:  pq.reverse,
 		value:    value,
 		priority: priority,
 	})
@@ -40,11 +47,19 @@ func (pq *PQ[T]) Dequeue() (T, error) {
 	return value, nil
 }
 
+func (pq *PQ[T]) Len() int {
+	return pq.heap.Len()
+}
+
 func (pqh pqh[T]) Len() int {
 	return len(pqh)
 }
 
 func (pqh pqh[T]) Less(i, j int) bool {
+	if pqh[i].reverse&1 != 0 {
+		return pqh[i].priority < pqh[j].priority
+	}
+
 	return pqh[i].priority > pqh[j].priority
 }
 
