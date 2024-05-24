@@ -2,6 +2,7 @@ package caravan_test
 
 import (
 	"errors"
+	"math/rand"
 	"testing"
 
 	"github.com/maladroitthief/caravan"
@@ -116,5 +117,67 @@ func Test_priority_queue_Dequeue(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func BenchmarkPriorityQueueEnqueue(b *testing.B) {
+	type entity struct {
+		id int
+	}
+
+	pq := caravan.NewPriorityQueue[entity](false)
+	for n := 0; n < b.N; n++ {
+		pq.Enqueue(entity{id: rand.Int()}, rand.Int())
+	}
+}
+
+func BenchmarkReversePriorityQueueEnqueue(b *testing.B) {
+	type entity struct {
+		id int
+	}
+
+	pq := caravan.NewPriorityQueue[entity](true)
+	for n := 0; n < b.N; n++ {
+		pq.Enqueue(entity{id: rand.Int()}, rand.Int())
+	}
+}
+
+func BenchmarkPriorityQueueDequeue(b *testing.B) {
+	type entity struct {
+		id int
+	}
+
+	pq := caravan.NewPriorityQueue[entity](false)
+	for i := 0; i < ContainerSize; i++ {
+		pq.Enqueue(entity{id: rand.Int()}, rand.Int())
+	}
+
+	for n := 0; n < b.N; n++ {
+		if n < ContainerSize {
+			_, err := pq.Dequeue()
+			if err != nil {
+				b.Errorf("PriorityQueue.Dequeue(false) error: %v", err)
+			}
+		}
+	}
+}
+
+func BenchmarkReversePriorityQueueDequeue(b *testing.B) {
+	type entity struct {
+		id int
+	}
+
+	pq := caravan.NewPriorityQueue[entity](true)
+	for i := 0; i < ContainerSize; i++ {
+		pq.Enqueue(entity{id: rand.Int()}, rand.Int())
+	}
+
+	for n := 0; n < b.N; n++ {
+		if n < ContainerSize {
+			_, err := pq.Dequeue()
+			if err != nil {
+				b.Errorf("PriorityQueue.Dequeue(false) error: %v", err)
+			}
+		}
 	}
 }
