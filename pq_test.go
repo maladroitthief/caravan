@@ -11,7 +11,7 @@ import (
 func Test_pq_Dequeue(t *testing.T) {
 	type item struct {
 		value    string
-		priority int
+		priority float64
 	}
 	tests := []struct {
 		name    string
@@ -127,7 +127,7 @@ func BenchmarkPQEnqueue(b *testing.B) {
 
 	pq := caravan.NewPQ[entity](false)
 	for n := 0; n < b.N; n++ {
-		pq.Enqueue(entity{id: rand.Int()}, rand.Int())
+		pq.Enqueue(entity{id: rand.Int()}, rand.Float64())
 	}
 }
 
@@ -138,7 +138,7 @@ func BenchmarkPQDequeue(b *testing.B) {
 
 	pq := caravan.NewPQ[entity](false)
 	for i := 0; i < ContainerSize; i++ {
-		pq.Enqueue(entity{id: rand.Int()}, rand.Int())
+		pq.Enqueue(entity{id: rand.Int()}, rand.Float64())
 	}
 
 	for n := 0; n < b.N; n++ {
@@ -158,7 +158,7 @@ func BenchmarkPQReverseEnqueue(b *testing.B) {
 
 	pq := caravan.NewPQ[entity](true)
 	for n := 0; n < b.N; n++ {
-		pq.Enqueue(entity{id: rand.Int()}, rand.Int())
+		pq.Enqueue(entity{id: rand.Int()}, rand.Float64())
 	}
 }
 
@@ -169,7 +169,7 @@ func BenchmarkPQReverseDequeue(b *testing.B) {
 
 	pq := caravan.NewPQ[entity](true)
 	for i := 0; i < ContainerSize; i++ {
-		pq.Enqueue(entity{id: rand.Int()}, rand.Int())
+		pq.Enqueue(entity{id: rand.Int()}, rand.Float64())
 	}
 
 	for n := 0; n < b.N; n++ {

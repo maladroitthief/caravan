@@ -9,7 +9,7 @@ type (
 	pqhi[T any] struct {
 		value    T
 		index    int
-		priority int
+		priority float64
 		reverse  byte
 	}
 
@@ -28,7 +28,7 @@ func NewPQ[T any](reverse bool) *PQ[T] {
 	return pq
 }
 
-func (pq *PQ[T]) Enqueue(value T, priority int) {
+func (pq *PQ[T]) Enqueue(value T, priority float64) {
 	pq.heap = pq.heap.Push(pqhi[T]{
 		reverse:  pq.reverse,
 		value:    value,
