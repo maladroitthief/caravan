@@ -28,7 +28,7 @@ jobs:
         run: go test -v ./...
 
       - name: Benchmark
-        run: go test -bench=. -benchmem | tee benchmark.txt
+        run: go test -bench=. -benchmem | tee output.txt
 
       - name: Download previous benchmark data
         uses: actions/cache@v4
@@ -40,9 +40,11 @@ jobs:
         uses: benchmark-action/github-action-benchmark@v1
         with:
           tool: 'go'
-          output-file-path: benchmark.txt
+          output-file-path: output.txt
           external-data-json-path: ./cache/benchmark-data.json
           fail-on-alert: true
+          summary-always: true
           github-token: ${{ secrets.GITHUB_TOKEN }}
           comment-on-alert: true
           alert-comment-cc-users: '@maladroitthief'
+          auto-push: true
