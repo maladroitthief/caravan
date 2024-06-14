@@ -1,5 +1,7 @@
 package caravan
 
+import "errors"
+
 type (
 	PQ[T any] struct {
 		heap    pqh[T]
@@ -14,6 +16,10 @@ type (
 	}
 
 	pqh[T any] []pqhi[T]
+)
+
+var (
+	ErrPriorityQueueEmpty = errors.New("priority queue has no elements")
 )
 
 func NewPQ[T any](reverse bool) *PQ[T] {
