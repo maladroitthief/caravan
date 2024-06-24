@@ -210,6 +210,6 @@ func (p *GIDXPool[T]) GetAll() []T {
 	return p.array.GetAll(p.allocator)
 }
 
-func (p GIDXPool[T]) GetAllIndices() []GIDX {
+func (p *GIDXPool[T]) GetAllIndices() []GIDX {
 	return p.array.GetAllIndices(p.allocator)
 }
